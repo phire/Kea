@@ -66,19 +66,21 @@ class gz80(Processor):
 				 "de" : Register(16),
 				 "hl" : Register(16),
 				 "sp" : Register(16),
-				 "a"  : SubRegister("af", 8, 0),
-				 "b"  : SubRegister("bc", 8, 0),
-				 "c"  : SubRegister("bc", 8, 8),
-				 "d"  : SubRegister("de", 8, 0),
-				 "e"  : SubRegister("de", 8, 8),
+				 "a"  : SubRegister("af", 8, 7),
+				 "b"  : SubRegister("bc", 8, 7),
+				 "c"  : SubRegister("bc", 8, 0),
+				 "d"  : SubRegister("de", 8, 7),
+				 "e"  : SubRegister("de", 8, 0),
+				 "h"  : SubRegister("hl", 8, 7),
+				 "l"  : SubRegister("hl", 8, 0),
 				 # cpu state
 				 "interupts": Register(1),
 				 "halted": Register(1),
 				 # flags
-				 "z"  : SubRegister("af", 1, 15), 
-				 "n"  : SubRegister("af", 1, 14),
-				 "h"  : SubRegister("af", 1, 13),
-				 "c"  : SubRegister("af", 1, 12)}
+				 "z"  : SubRegister("af", 1, 7), 
+				 "n"  : SubRegister("af", 1, 6),
+				 "h"  : SubRegister("af", 1, 5),
+				 "c"  : SubRegister("af", 1, 4)}
 
 	def decodeInstruction(self, state, stream):
 		b = stream.load8()
