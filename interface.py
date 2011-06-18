@@ -31,3 +31,6 @@ class Instruction(object):
 	def __init__(self, asm, effects):
 		self.asm = asm
 		self.effects = effects
+
+	def __repr__(self):
+		return self.asm

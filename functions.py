@@ -29,13 +29,26 @@ def eq(a, b):
 def mul(a, b):
 	return a * b
 
+def mod(val, d):
+	return val % d
+
 class Memory8(object):
 	def __init__(self, addr):
 		self.addr = addr
 
+	def __repr__(self):
+		if type(self.addr) is int:
+			return "(0x%04x)" % self.addr
+		return "(%s)" % self.addr
+
 class Memory16(object):
 	def __init__(self, addr):
 		self.addr = addr
+
+	def __repr__(self):
+		if type(self.addr) is int:
+			return "(0x%04x)" % self.addr
+		return "(%s)" % self.addr
 
 def rotleft(shift, size, value):
 	value = value << shift
