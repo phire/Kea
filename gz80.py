@@ -94,7 +94,7 @@ class gz80(Processor):
                 return Instruction("halt", {"pc": [add, "pc", 1], "halted": 1})
             else:
                 return Instruction("ld %s, %s" % (regs[y], regs[z]),
-                        {regs[y]: [regs[z]],
+                        {regs[y]: regs[z],
                          "pc": [add, "pc", 1]})
         if x == 2:
             if y == 0:
@@ -166,26 +166,26 @@ class gz80(Processor):
                     return Instruction("stop", {"pc": [add, "pc", 1], "halted": 1})
                 d = stream.read8s()
                 if y == 3:
-                    return Instruction("jr %i" % d, {"pc": [add, "pc", d]})
+                    return Instruction("jr %i" % d, {"pc": [add, "pc", d+2]})
                 if y == 4:
                     return Instruction("jr nz,%i" % d, 
                         {"pc": [if_, "z", 
                                     [add, "pc", 2], 
-                                    [add, "pc", d]]})
+                                    [add, "pc", d+2]]})
                 if y == 5:
                     return Instruction("jr z,%i" % d, 
                         {"pc": [if_, "z", 
-                                    [add, "pc", d], 
+                                    [add, "pc", d+2], 
                                     [add, "pc", 2]]})
                 if y == 6:
                     return Instruction("jr nc,%i" % d, 
                         {"pc": [if_, "c", 
                                     [add, "pc", 2], 
-                                    [add, "pc", d]]})
+                                    [add, "pc", d+2]]})
                 if y == 7:
                     return Instruction("jr c,%i" % d, 
                         {"pc": [if_, "c", 
-                                    [add, "pc", d], 
+                                    [add, "pc", d+2], 
                                     [add, "pc", 2]]})
             if z == 1:
                 if q == 0:
@@ -227,7 +227,7 @@ class gz80(Processor):
             if z == 6:
                 n = stream.read8()
                 return Instruction("ld %s,0x%02x" % (regs[y],n), 
-                    {regs[y]: [n], 
+                    {regs[y]: n, 
                      "pc": [add, "pc", 2]})
             if z == 7:
                 return x0z7[y]
@@ -282,7 +282,7 @@ class gz80(Processor):
                 if y == 6:
                     n = stream.read8()
                     return Instruction("ld a,(0xff00+0x%02x)" % n, 
-                        {Memory8(0xff00+n): "a", 
+                        {"a": Memory8(0xff00+n), 
                          "pc": [add, "pc", 2]})
                 if y == 7:
                     d = stream.read8s()

@@ -15,16 +15,16 @@ def orl(a, b):
 
 def bit(bit, val):
 	mask = ~(1 << bit)
-	return not (val ^ mask) 
+	return int(not (val ^ mask)) 
 
 def gt(a, b):
-	return a > b
+	return int(a > b)
 
 def lt(a, b):
-	return a < b
+	return int(a < b)
 
 def eq(a, b):
-	return a == b
+	return int(a == b)
 
 def mul(a, b):
 	return a * b
