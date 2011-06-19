@@ -1,6 +1,11 @@
 from gz80 import gz80
 from interface import ProgramCounter
 from bus import Stream
+import solver
+
+class StartTrace(object):
+	def __init__(self, address):
+		self.effects = {"pc": address, "a": 0x11}
 
 class Core(object):
 	def __init__(self, processor):
@@ -14,10 +19,17 @@ class Core(object):
 	def attachMemory(self, memory):
 		self.mem = memory
 
-	def disassemble(self, address):
-		inst = self.proc.decode(None, Stream(self.mem, address))
-		return inst
+	def startTrace(self, address):
+		trace = [StartTrace(address)]
+		pc = solver.solve(trace, self.pc)
+		while type(pc) is int:
+			inst = self.proc.decode(None, Stream(self.mem, pc))
+			trace.append(inst)
+			print inst
+			pc = solver.solve(trace, self.pc)
+		print trace
+		print pc
 
 core = Core(gz80())
 core.attachMemory(open("page00").read())
-
+core.startTrace(0x100)
