@@ -16,7 +16,8 @@ class Core(object):
 			if type(self.regs[reg]) is ProgramCounter:
 				self.pc = reg
 		self.observers = []
-		self.text = [[Text("ROM0:0150", gray), Tab(100), Text("cp ", blue), Text("a", orange), Text(", ", blue), Text("0x11", green)],[Text("ROM0:0152", gray), Tab(100), Text("jr ", blue), Text("z", orange), Text(", ", blue), Text("0x157", green)]]
+		self.decoding = {}
+		#self.text = [[Text("ROM0:0150", gray), Tab(100), Text("cp ", blue), Text("a", orange), Text(", ", blue), Text("0x11", green)],[Text("ROM0:0152", gray), Tab(100), Text("jr ", blue), Text("z", orange), Text(", ", blue), Text("0x157", green)]]
 
 		
 	def attachMemory(self, memory):
@@ -41,7 +42,16 @@ class Core(object):
 			observer.notify(self)
 
 	def getText(self, start, length):
-		return self.text
+		text = []
+		for i in range(start, start + length):
+			try: 
+				text.append(self.decoding[i].asm)
+			except KeyError:
+				text.append([Text("ROM0:%04x" % i, gray), Tab(100), Text("db ", blue), Text("0x%02x" % ord(self.mem[i]), green)])
+		return text
+
+	def getTextSize(self):
+		return len(self.mem)
 
 if __name__ == "__main__":
 	core = Core(gz80())

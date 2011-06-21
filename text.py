@@ -9,11 +9,11 @@ class Text(object):
 	def mouseIn(self, widget):
 		self.oldColor = self.color
 		self.color = (255, 0, 0)
-		widget.repaint()
+		widget.update()
 	
 	def mouseOut(self, widget):
 		self.color = self.oldColor
-		widget.repaint()
+		widget.update()
 
 class Tab(object):
 	def __init__(self, stop):
