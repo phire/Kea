@@ -2,6 +2,7 @@ from gz80 import gz80
 from interface import ProgramCounter
 from bus import Stream
 import solver
+from text import *
 
 class StartTrace(object):
 	def __init__(self, address):
@@ -14,7 +15,9 @@ class Core(object):
 		for reg in self.regs: # Find the program counter
 			if type(self.regs[reg]) is ProgramCounter:
 				self.pc = reg
-		
+		self.observers = []
+		self.text = [[Text("ROM0:0150", gray), Tab(100), Text("cp ", blue), Text("a", orange), Text(", ", blue), Text("0x11", green)],[Text("ROM0:0152", gray), Tab(100), Text("jr ", blue), Text("z", orange), Text(", ", blue), Text("0x157", green)]]
+
 		
 	def attachMemory(self, memory):
 		self.mem = memory
@@ -29,7 +32,18 @@ class Core(object):
 			pc = solver.solve(trace, self.pc)
 		print trace
 		print pc
+	
+	def addObserver(self, observer):
+		self.observers.append(observer)
 
-core = Core(gz80())
-core.attachMemory(open("page00").read())
-core.startTrace(0x100)
+	def notifyObservers(self):
+		for observer in self.observers:
+			observer.notify(self)
+
+	def getText(self, start, length):
+		return self.text
+
+if __name__ == "__main__":
+	core = Core(gz80())
+	core.attachMemory(open("page00").read())
+	core.startTrace(0x100)

@@ -1,31 +1,6 @@
 from PySide.QtCore import *
 from PySide.QtGui import *
-
-class Text(object):
-	def __init__(self, text, color=(0, 0, 0)):
-		self.text = text
-		self.color = color
-		
-	def __str__(self):
-		return self.text
-
-	def mouseIn(self, widget):
-		self.oldColor = self.color
-		self.color = (255, 0, 0)
-		widget.repaint()
-	
-	def mouseOut(self, widget):
-		self.color = self.oldColor
-		widget.repaint()
-
-class Tab(object):
-	def __init__(self, stop):
-		self.stop = stop
-
-gray = (150, 150, 150)
-blue = (0, 60, 200)
-green = (0, 200, 60)
-orange = (255, 176, 31)
+from text import *
 
 class AsmArea(QWidget):
 	def __init__(self, parent=None):
@@ -42,11 +17,18 @@ class AsmArea(QWidget):
 		self.h = self.fm.height() 
 		self.setFont(self.font)
 		self.highlightLine = 0
-		self.setContent(text)
 		self.hover = None
 
-	def setContent(self, content):
-		self.text = content
+	def notify(self, subject):
+		self.updateContent()
+
+	def setContentSource(self, source):
+		self.source = source
+		source.addObserver(self)
+		self.updateContent()
+
+	def updateContent(self):
+		self.text = self.source.getText(0, 20)
 		for line in self.text:
 			x = 5
 			for word in line:
@@ -83,11 +65,10 @@ class AsmArea(QWidget):
 		painter.fillRect(0, self.h * self.highlightLine, self.width(), self.h, self.palette().alternateBase())
 
 		for i,line in enumerate(self.text, 1):
-			x = 5
 			for word in line:
-				if type(word) is Tab:
-					x = max(word.stop, x)
-					continue
-				painter.setPen(QColor(*word.color))
+				try:
+					painter.setPen(QColor(*word.color))
+				except AttributeError:
+					painter.setPen(QColor(0, 0, 0))
 				painter.drawText(word.left, i * self.h - self.fm.descent(), str(word))
 
