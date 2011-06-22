@@ -18,7 +18,7 @@ class MainWindow(QMainWindow):
 		self.asmArea.setContentSource(self.core)
 		self.setCentralWidget(self.asmArea)
 
-		self.setWindowTitle("kea")
+		self.setWindowTitle("kea - page00")
 		self.resize(800,600)
 
 	def createMenus(self):

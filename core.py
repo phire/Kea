@@ -16,23 +16,32 @@ class Core(object):
 			if type(self.regs[reg]) is ProgramCounter:
 				self.pc = reg
 		self.observers = []
-		self.decoding = {}
+		self.decoded = {}
 		#self.text = [[Text("ROM0:0150", gray), Tab(100), Text("cp ", blue), Text("a", orange), Text(", ", blue), Text("0x11", green)],[Text("ROM0:0152", gray), Tab(100), Text("jr ", blue), Text("z", orange), Text(", ", blue), Text("0x157", green)]]
 
 		
 	def attachMemory(self, memory):
 		self.mem = memory
+		for i in xrange(len(memory)):
+			self.decoded[i] = [Text("db ", blue), Text("0x%02x" % ord(self.mem[i]), green)]
 
 	def startTrace(self, address):
 		trace = [StartTrace(address)]
 		pc = solver.solve(trace, self.pc)
-		while type(pc) is int:
-			inst = self.proc.decode(None, Stream(self.mem, pc))
+		while type(pc) is int and pc < 0x4000:
+			stream = Stream(self.mem, pc)
+			inst = self.proc.decode(None, stream)
 			trace.append(inst)
-			print inst
+			self.decoded[pc] = [Text(inst.asm, blue)]
+			count = stream.count
+			while count > 1:
+				count -= 1
+				try:
+					del self.decoded[pc + count]
+				except KeyError:
+					pass
 			pc = solver.solve(trace, self.pc)
-		print trace
-		print pc
+		self.notifyObservers()
 	
 	def addObserver(self, observer):
 		self.observers.append(observer)
@@ -43,15 +52,20 @@ class Core(object):
 
 	def getText(self, start, length):
 		text = []
+		lines = sorted(self.decoded.keys())
 		for i in range(start, start + length):
-			try: 
-				text.append(self.decoding[i].asm)
+			try:
+				text.append([Text("ROM0:%04x" % lines[i], gray), Tab(100)] + self.decoded[lines[i]])
 			except KeyError:
-				text.append([Text("ROM0:%04x" % i, gray), Tab(100), Text("db ", blue), Text("0x%02x" % ord(self.mem[i]), green)])
+				break
 		return text
 
 	def getTextSize(self):
-		return len(self.mem)
+		return len(self.decoded)
+
+	def makeCode(self, line):
+		lines = sorted(self.decoded.keys())
+		self.startTrace(lines[line])
 
 if __name__ == "__main__":
 	core = Core(gz80())

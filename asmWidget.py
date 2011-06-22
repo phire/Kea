@@ -11,17 +11,19 @@ class AsmArea(QAbstractScrollArea):
 
 		text = [[Text("ROM0:0150", gray), Tab(100), Text("cp ", blue), Text("a", orange), Text(", ", blue), Text("0x11", green)],[Text("ROM0:0152", gray), Tab(100), Text("jr ", blue), Text("z", orange), Text(", ", blue), Text("0x157", green)]]
 		self.setMouseTracking(True)
+		self.setFocusPolicy(Qt.ClickFocus)
 
 		self.font = QFont("Courier", 10)
 		self.fm = QFontMetrics(self.font)
 		self.h = self.fm.height() 
 		self.setFont(self.font)
-		self.highlightLine = 0
+		self.selectedLine = 0
+		self.hoverLine = 0
 		self.hover = None
 		self.scroll = 0
 
 		self.verticalScrollBar().setSingleStep(self.h)
-
+		self.verticalScrollBar().setPageStep(self.height())
 
 	def resizeEvent(self, event):
 		self.updateContent()
@@ -52,16 +54,13 @@ class AsmArea(QAbstractScrollArea):
 					x += self.fm.width(str(word))
 				word.right = x
 		self.viewport().update()
-		self.verticalScrollBar().setPageStep(self.source.getTextSize() * self.h)
 		self.verticalScrollBar().setRange(0, self.source.getTextSize() * self.h - self.height())
 
 	def mouseMoveEvent(self, event):
-		if not self.highlightLine == event.pos().y() / self.h:
-			self.highlightLine = event.pos().y() / self.h
-			self.viewport().update()
+		self.hoverLine = event.pos().y() / self.h
 		x = event.pos().x()
 		try:
-			hover = filter(lambda w: w.left < x and w.right > x, self.text[self.highlightLine])[0]
+			hover = filter(lambda w: w.left < x and w.right > x, self.text[self.hoverLine])[0]
 		except IndexError:
 			hover = None
 		if hover is not self.hover:
@@ -75,10 +74,26 @@ class AsmArea(QAbstractScrollArea):
 				pass
 			self.hover = hover
 
+	def mousePressEvent(self, event):
+		self.selectedLine = self.hoverLine
+		self.viewport().update()
+
+	def keyPressEvent(self, event):
+		if event.key() == Qt.Key_Up:
+			self.selectedLine -= 1
+			self.viewport().update()
+		elif event.key() == Qt.Key_Down:
+			self.selectedLine += 1
+			self.viewport().update()
+		elif event.key() == Qt.Key_C:
+			self.source.makeCode(self.selectedLine + self.scroll / self.h)
+		else:
+			super(AsmArea, self).keyPressEvent(event)
+
 	def paintEvent(self, event):
 		painter = QPainter(self.viewport())
 
-		painter.fillRect(0, self.h * self.highlightLine - self.scroll % self.h, self.width(), self.h, self.palette().alternateBase())
+		painter.fillRect(0, self.h * self.selectedLine - self.scroll % self.h, self.width(), self.h, self.palette().alternateBase())
 
 		for i,line in enumerate(self.text, 1):
 			for word in line:

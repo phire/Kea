@@ -190,8 +190,8 @@ class gz80(Processor):
             if z == 1:
                 if q == 0:
                     nn = stream.read16()
-                    return Instruction("ld %s,nn" % regpairs[p], 
-                        {regpairs[p]: [Memory8(nn)],
+                    return Instruction("ld %s,0x%04x" % (regpairs[p], nn), 
+                        {regpairs[p]: nn,
                          "pc": [add, "pc", 3]})
                 if q == 1:
                     return Instruction("add hl,%s" % regpairs[p], 
