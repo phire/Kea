@@ -490,7 +490,7 @@ class gz80(Processor):
                          "h": [gt, [add, [xorl, "a", 0xf], n^0xf], 0xf],
                          "c": [gt, [add, "a", n], 0xff]}) 
             if z==7:
-                return Instruction("rst 0x%02x" % y*8, 
+                return Instruction("rst 0x%02x" % (y*8), 
                         {"pc": y*8,
                          Memory16([sub, "sp", 2]): [add, "pc", 1],
                          "sp": [sub, "sp", 2]})
@@ -564,7 +564,8 @@ class gz80(Processor):
             return Instruction("set %i,%s" % (y, regs[z]),
                         {"pc": [add, "pc", 2],
                          regs[z]: [orl, regs[z], 1 << y]})
-        if x == 3: Instruction("res %i,%s" % (y, regs[z]),
+        if x == 3: 
+			return Instruction("res %i,%s" % (y, regs[z]),
                         {"pc": [add, "pc", 2],
                          regs[z]: [xorl, regs[z], ~(1 << y)]})
 
