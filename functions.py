@@ -6,6 +6,10 @@ def infix(fmt):
 		return fn
 	return decorator
 
+def conditional(fn):
+	fn.conditional = True
+	return fn
+
 @infix("%s + %s")
 def add(a, b):
 	return a + b
@@ -88,6 +92,7 @@ def shiftleft(shift, value):
 def shiftright(shift, value):
 	return value >> shift
 
+@conditional
 @infix("if (%s): %s else %s")
 def if_(cond, expr1, expr2):
 	if cond:

@@ -45,19 +45,46 @@ class Sexpression(list):
 		t = tuple([x.infix() if type(x) is Sexpression else x for x in self[1:]])
 		return self[0].pp(t)
 
+	def contains(self, reg):
+		for x in self[1:]:
+			if type(x) is Sexpression:
+				if x.contains(reg):
+					return True
+			elif x == reg:
+				return True
+		return False
+
+	def isConditional(self):
+		return hasattr(self[0], "conditional")
+
 class Instruction(object):
+	def __setattr__(self, *args):
+		raise TypeError("can't modify immutable instance")
+	__delattr__ = __setattr__
 	def __init__(self, asm, effects):
-		self.asm = asm
+		super(Instruction, self).__setattr__('asm', asm)	#self.asm = asm
 		for e in effects.keys():
 			if type(effects[e]) is list:
 				effects[e] = Sexpression(effects[e])
-		self.effects = effects
+		super(Instruction, self).__setattr__('effects', effects) #self.effects = effects
 
 	def __repr__(self):
 		return self.asm
 
 	def prettyPrint(self):
 		return self.asm
+
+	def stores(self, reg):
+		""" If this instruciton stores reg into another register or a 
+			memory address, this will return that memory address/register.
+			Otherwise, returns None.
+		"""
+		for e in self.effects.keys():
+			if type(self.effects[e]) is Sexpression:
+				if self.effects[e].contains(reg):
+					if e is not reg:
+						return e
+		return None
 
 class Address(object):
 	def __init__(self, addr):

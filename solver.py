@@ -1,10 +1,14 @@
 import types
 from interface import *
+import copy
 
 def solve(trace, var):
 	equ = build_equ(trace, var)
-#	print equ
 	return execute(equ)
+
+def solveBoth(trace, var):
+	equ = build_equ(trace, var)
+	return (execute(equ[2]), execute(equ[3]))
 
 def build_equ(trace, var):
 	equ = var
@@ -35,8 +39,8 @@ def needed(eq):
 
 def replace(var, with_equ, in_equ):
 	out = in_equ
-	if type(out) is str and out == var:
-		out = with_equ
+	if out == var:
+		out = copy.deepcopy(with_equ) # Make sure we get a copy, otherwise solved equations might escape.
 	elif type(out) is Sexpression:
 		for i in range(len(out)):
 			out[i] = replace(var, with_equ, out[i])
