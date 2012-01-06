@@ -34,3 +34,12 @@ class Instruction(object):
 
 	def __repr__(self):
 		return self.asm
+
+	def prettyPrint(self):
+		return self.asm
+
+class Address(object):
+	def __init__(self, addr):
+		pass
+
+#class RealtiveAddress(Address):

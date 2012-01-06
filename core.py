@@ -17,8 +17,6 @@ class Core(object):
 				self.pc = reg
 		self.observers = []
 		self.decoded = {}
-		#self.text = [[Text("ROM0:0150", gray), Tab(100), Text("cp ", blue), Text("a", orange), Text(", ", blue), Text("0x11", green)],[Text("ROM0:0152", gray), Tab(100), Text("jr ", blue), Text("z", orange), Text(", ", blue), Text("0x157", green)]]
-
 		
 	def attachMemory(self, memory):
 		self.mem = memory
