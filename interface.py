@@ -27,9 +27,30 @@ class SubRegister(Register):
 		self.size = size
 		self.offset = offset
 
+class Sexpression(list):
+	def __init__(self, l):
+		for i, x in enumerate(l):
+			if type(x) is list:
+				l[i] = Sexpression(x)
+		super(Sexpression, self).__init__(l)
+
+	def __str__(self):
+		string = "(" + self[0].func_name
+		for x in self[1:]:
+			string += " "
+			string += str(x)
+		return string + ")"
+
+	def infix(self):
+		t = tuple([x.infix() if type(x) is Sexpression else x for x in self[1:]])
+		return self[0].pp(t)
+
 class Instruction(object):
 	def __init__(self, asm, effects):
 		self.asm = asm
+		for e in effects.keys():
+			if type(effects[e]) is list:
+				effects[e] = Sexpression(effects[e])
 		self.effects = effects
 
 	def __repr__(self):

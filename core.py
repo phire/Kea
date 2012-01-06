@@ -40,6 +40,7 @@ class Core(object):
 					pass
 			pc = solver.solve(trace, self.pc)
 		self.notifyObservers()
+		print "pc = " + pc.infix()
 	
 	def addObserver(self, observer):
 		self.observers.append(observer)
